@@ -27,21 +27,20 @@ class MainViewController: UITableViewController {
         configureSimpleSearchTextField()
         
         // 2 - Configure a custom search text field
-        configureCustomSearchTextField()
+        //configureCustomSearchTextField()
 
         // 3 - Configure an "inline" suggestions search text field
-        configureSimpleInLineSearchTextField()
+        //configureSimpleInLineSearchTextField()
 
         // 4 - Configure a custom "inline" suggestions search text field
-        configureCustomInLineSearchTextField()
+        //configureCustomInLineSearchTextField()
     }
     
     // 1 - Configure a simple search text view
     fileprivate func configureSimpleSearchTextField() {
-        // Start visible even without user's interaction as soon as created - Default: false
-        countryTextField.startVisibleWithoutInteraction = true
-        
         // Set data source
+        countryTextField.comparisonOptions = [.caseInsensitive]
+        countryTextField.startFilteringAfter = "@"
         let countries = localCountries()
         countryTextField.filterStrings(countries)
     }
@@ -98,7 +97,7 @@ class MainViewController: UITableViewController {
         acronymTextField.userStoppedTypingHandler = {
             if let criteria = self.acronymTextField.text {
                 if criteria.count > 1 {
-                    
+                    self.acronymTextField.filterText = criteria
                     // Show loading indicator
                     self.acronymTextField.showLoadingIndicator()
                     
@@ -116,10 +115,6 @@ class MainViewController: UITableViewController {
     
     // 3 - Configure a simple inline search text view
     fileprivate func configureSimpleInLineSearchTextField() {
-        // Define the inline mode
-        countryInLineTextField.inlineMode = true
-        
-        
         // Set data source
         let countries = localCountries()
         countryInLineTextField.filterStrings(countries)
@@ -127,9 +122,6 @@ class MainViewController: UITableViewController {
 
     // 4 - Configure a custom inline search text view
     fileprivate func configureCustomInLineSearchTextField() {
-        // Define the inline mode
-        emailInlineTextField.inlineMode = true
-        
         emailInlineTextField.startFilteringAfter = "@"
         emailInlineTextField.startSuggestingInmediately = true
         

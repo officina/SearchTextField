@@ -1,0 +1,5 @@
+version: "Apple Swift version 4.2 (swiftlang-1000.11.37.1 clang-1000.11.45.1)"
+options: "0e7d732b8e430bbf33020c5531e23e93"
+build_time: [1539789626, 64154000]
+inputs:
+  "/Users/riccardogazzea/Documents/code/_officina/nowr/SearchTextField/SearchTextField/Classes/SearchTextField.swift": [1539789174, 0]

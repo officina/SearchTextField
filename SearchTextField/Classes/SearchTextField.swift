@@ -12,7 +12,8 @@ open class SearchTextField: UITextField {
     
     ////////////////////////////////////////////////////////////////////////
     // Public interface
-    
+    //
+    open var filterText = ""
     /// Maximum number of results to be shown in the suggestions list
     open var maxNumberOfResults = 0
     
@@ -100,14 +101,14 @@ open class SearchTextField: UITextField {
     }
     
     /// When InlineMode is true, the suggestions appear in the same line than the entered string. It's useful for email domains suggestion for example.
-    open var inlineMode: Bool = false {
+    /*open var inlineMode: Bool = false {
         didSet {
             if inlineMode == true {
                 autocorrectionType = .no
                 spellCheckingType = .no
             }
         }
-    }
+    }*/
     
     /// Only valid when InlineMode is true. The suggestions appear after typing the provided string (or even better a character like '@')
     open var startFilteringAfter: String?
@@ -186,11 +187,7 @@ open class SearchTextField: UITextField {
     override open func layoutSubviews() {
         super.layoutSubviews()
         
-        if inlineMode {
-            buildPlaceholderLabel()
-        } else {
-            buildSearchTableView()
-        }
+        buildSearchTableView()
         
         // Create the loading indicator
         indicator.hidesWhenStopped = true
@@ -263,11 +260,6 @@ open class SearchTextField: UITextField {
     
     // Re-set frames and theme colors
     fileprivate func redrawSearchTableView() {
-        if inlineMode {
-            tableView?.isHidden = true
-            return
-        }
-        
         if let tableView = tableView {
             guard let frame = self.superview?.convert(self.frame, to: nil) else { return }
             
@@ -363,7 +355,7 @@ open class SearchTextField: UITextField {
     
     // Handle text field changes
     @objc open func textFieldDidChange() {
-        if !inlineMode && tableView == nil {
+        if tableView == nil {
             buildSearchTableView()
         }
         
@@ -389,7 +381,7 @@ open class SearchTextField: UITextField {
     }
     
     @objc open func textFieldDidBeginEditing() {
-        if (startVisible || startVisibleWithoutInteraction) && text!.isEmpty {
+        if (startVisible || startVisibleWithoutInteraction) && self.filterText.isEmpty {
             clearResults()
             filter(forceShowAll: true)
         }
@@ -408,12 +400,11 @@ open class SearchTextField: UITextField {
                 itemSelectionHandler(filteredResults, 0)
             }
             else {
-                if inlineMode, let filterAfter = startFilteringAfter {
-                    let stringElements = self.text?.components(separatedBy: filterAfter)
-                    
-                    self.text = stringElements!.first! + filterAfter + firstElement.title
+                if let filterAfter = startFilteringAfter {
+                    let stringElements = self.filterText.components(separatedBy: filterAfter)
+                    self.text = self.text?.replacingOccurrences(of: self.filterText, with: stringElements.first! + filterAfter + firstElement.title)
                 } else {
-                    self.text = firstElement.title
+                    self.text = self.text?.replacingOccurrences(of: self.filterText, with: firstElement.title)
                 }
             }
         }
@@ -432,7 +423,7 @@ open class SearchTextField: UITextField {
     fileprivate func filter(forceShowAll addAll: Bool) {
         clearResults()
         
-        if text!.count < minCharactersNumberToStartFiltering {
+        if self.text!.count < minCharactersNumberToStartFiltering {
             return
         }
         
@@ -440,10 +431,19 @@ open class SearchTextField: UITextField {
             
             let item = filterDataSource[i]
             
-            if !inlineMode {
-                // Find text in title and subtitle
-                let titleFilterRange = (item.title as NSString).range(of: text!, options: comparisonOptions)
-                let subtitleFilterRange = item.subtitle != nil ? (item.subtitle! as NSString).range(of: text!, options: comparisonOptions) : NSMakeRange(NSNotFound, 0)
+            if let filterAfter = startFilteringAfter {
+                var textToFilter = self.text!.lowercased()
+                
+                if let suffixToFilter = textToFilter.components(separatedBy: filterAfter).last, (suffixToFilter != "" || startSuggestingInmediately == true), textToFilter != suffixToFilter {
+                    textToFilter = suffixToFilter
+                    self.filterText = textToFilter
+                } else {
+                    placeholderLabel?.text = ""
+                    return
+                }
+                
+                let titleFilterRange = (item.title as NSString).range(of: textToFilter, options: comparisonOptions)
+                let subtitleFilterRange = item.subtitle != nil ? (item.subtitle! as NSString).range(of: textToFilter, options: comparisonOptions) : NSMakeRange(NSNotFound, 0)
                 
                 if titleFilterRange.location != NSNotFound || subtitleFilterRange.location != NSNotFound || addAll {
                     item.attributedTitle = NSMutableAttributedString(string: item.title)
@@ -458,32 +458,26 @@ open class SearchTextField: UITextField {
                     filteredResults.append(item)
                 }
             } else {
-                var textToFilter = text!.lowercased()
+                // Find text in title and subtitle
+                let titleFilterRange = (item.title as NSString).range(of: self.filterText, options: comparisonOptions)
+                let subtitleFilterRange = item.subtitle != nil ? (item.subtitle! as NSString).range(of: self.filterText, options: comparisonOptions) : NSMakeRange(NSNotFound, 0)
                 
-                if inlineMode, let filterAfter = startFilteringAfter {
-                    if let suffixToFilter = textToFilter.components(separatedBy: filterAfter).last, (suffixToFilter != "" || startSuggestingInmediately == true), textToFilter != suffixToFilter {
-                        textToFilter = suffixToFilter
-                    } else {
-                        placeholderLabel?.text = ""
-                        return
-                    }
-                }
-                
-                if item.title.lowercased().hasPrefix(textToFilter) {
-                    let indexFrom = textToFilter.index(textToFilter.startIndex, offsetBy: textToFilter.count)
-                    let itemSuffix = item.title[indexFrom...]
+                if titleFilterRange.location != NSNotFound || subtitleFilterRange.location != NSNotFound || addAll {
+                    item.attributedTitle = NSMutableAttributedString(string: item.title)
+                    item.attributedSubtitle = NSMutableAttributedString(string: (item.subtitle != nil ? item.subtitle! : ""))
                     
-                    item.attributedTitle = NSMutableAttributedString(string: String(itemSuffix))
+                    item.attributedTitle!.setAttributes(highlightAttributes, range: titleFilterRange)
+                    
+                    if subtitleFilterRange.location != NSNotFound {
+                        item.attributedSubtitle!.setAttributes(highlightAttributesForSubtitle(), range: subtitleFilterRange)
+                    }
+                    
                     filteredResults.append(item)
                 }
             }
         }
         
         tableView?.reloadData()
-        
-        if inlineMode {
-            handleInlineFiltering()
-        }
     }
     
     // Clean filtered results
@@ -511,15 +505,13 @@ open class SearchTextField: UITextField {
     
     // Handle inline behaviour
     func handleInlineFiltering() {
-        if let text = self.text {
-            if text == "" {
-                self.placeholderLabel?.attributedText = nil
+        if self.filterText == "" {
+            self.placeholderLabel?.attributedText = nil
+        } else {
+            if let firstResult = filteredResults.first {
+                self.placeholderLabel?.attributedText = firstResult.attributedTitle
             } else {
-                if let firstResult = filteredResults.first {
-                    self.placeholderLabel?.attributedText = firstResult.attributedTitle
-                } else {
-                    self.placeholderLabel?.attributedText = nil
-                }
+                self.placeholderLabel?.attributedText = nil
             }
         }
     }
@@ -594,7 +586,7 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if itemSelectionHandler == nil {
-            self.text = filteredResults[(indexPath as NSIndexPath).row].title
+            self.text = self.text?.replacingOccurrences(of: self.filterText, with: filteredResults[(indexPath as NSIndexPath).row].title)
         } else {
             let index = indexPath.row
             itemSelectionHandler!(filteredResults, index)
