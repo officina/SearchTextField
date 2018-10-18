@@ -1,16 +1,25 @@
 PODS:
-  - SearchTextField (1.2.2)
+  - SDWebImage (4.4.2):
+    - SDWebImage/Core (= 4.4.2)
+  - SDWebImage/Core (4.4.2)
+  - SearchTextField (1.2.3):
+    - SDWebImage (~> 4.0)
 
 DEPENDENCIES:
   - SearchTextField (from `../`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - SDWebImage
 
 EXTERNAL SOURCES:
   SearchTextField:
     :path: "../"
 
 SPEC CHECKSUMS:
-  SearchTextField: b55c8edf3898f27e5f9b68319b77136ab05d8339
+  SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
+  SearchTextField: d7cdf6efcf88661fd4abe1c3a5b04f7fa53e8313
 
 PODFILE CHECKSUM: 479530ad58865b7087404979b3c82b4f43e856cc
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.5.0

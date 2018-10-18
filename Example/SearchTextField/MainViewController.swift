@@ -172,7 +172,12 @@ class MainViewController: UITableViewController {
                             var results = [SearchTextFieldItem]()
                             
                             for result in jsonResults {
-                                results.append(SearchTextFieldItem(title: result["lf"] as! String, subtitle: criteria.uppercased(), image: UIImage(named: "acronym_icon")))
+                                results.append(SearchTextFieldItem(
+                                    title: result["lf"] as! String,
+                                    subtitle: criteria.uppercased(),
+                                    imagePlaceholder: UIImage(named: "acronym_icon"),
+                                    imageUrl: "")
+                                )
                             }
                             
                             DispatchQueue.main.async {

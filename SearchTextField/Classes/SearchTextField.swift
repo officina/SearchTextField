@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 open class SearchTextField: UITextField {
     
@@ -574,6 +575,9 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
         cell!.detailTextLabel?.attributedText = filteredResults[(indexPath as NSIndexPath).row].attributedSubtitle
         
         cell!.imageView?.image = filteredResults[(indexPath as NSIndexPath).row].image
+        cell!.imageView?.sd_setImage(
+            with: URL(string: filteredResults[(indexPath as NSIndexPath).row].imageUrl!),
+            placeholderImage: filteredResults[(indexPath as NSIndexPath).row].image)
         
         cell!.selectionStyle = .none
         
@@ -641,11 +645,13 @@ open class SearchTextFieldItem {
     public var title: String
     public var subtitle: String?
     public var image: UIImage?
+    public var imageUrl: String?
     
-    public init(title: String, subtitle: String?, image: UIImage?) {
+    public init(title: String, subtitle: String?, imagePlaceholder: UIImage?, imageUrl: String?) {
         self.title = title
         self.subtitle = subtitle
-        self.image = image
+        self.image = imagePlaceholder
+        self.imageUrl = imageUrl
     }
     
     public init(title: String, subtitle: String?) {
