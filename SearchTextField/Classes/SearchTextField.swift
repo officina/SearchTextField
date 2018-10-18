@@ -405,12 +405,16 @@ open class SearchTextField: UITextField {
                 if let filterAfter = startFilteringAfter {
                     let stringElements = self.filterText.components(separatedBy: filterAfter)
                     self.text = self.text?.replacingOccurrences(of: self.filterText, with: stringElements.first! + filterAfter + firstElement.title)
+                    if !self.mentions.contains(stringElements.first! + filterAfter + firstElement.title) {
+                        self.mentions.append(stringElements.first! + filterAfter + firstElement.title)
+                    }
                 } else {
                     self.text = self.text?.replacingOccurrences(of: self.filterText, with: firstElement.title)
+                    if !self.mentions.contains(firstElement.title) {
+                        self.mentions.append(firstElement.title)
+                    }
                 }
-                if !self.mentions.contains(self.filterText) {
-                    self.mentions.append(self.filterText)
-                }
+                
                 self.filterText = ""
             }
         }
@@ -590,8 +594,8 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if itemSelectionHandler == nil {
             self.text = self.text?.replacingOccurrences(of: self.filterText, with: filteredResults[(indexPath as NSIndexPath).row].title)
-            if !self.mentions.contains(self.filterText) {
-                self.mentions.append(self.filterText)
+            if !self.mentions.contains(filteredResults[(indexPath as NSIndexPath).row].title) {
+                self.mentions.append(filteredResults[(indexPath as NSIndexPath).row].title)
             }
             self.filterText = ""
         } else {
