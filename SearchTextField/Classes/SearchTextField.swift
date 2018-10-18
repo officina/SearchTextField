@@ -26,9 +26,11 @@ open class SearchTextField: UITextField {
     
     /// Indicate if keyboard is showing or not
     open var keyboardIsShowing = false
-
+    
     /// How long to wait before deciding typing has stopped
     open var typingStoppedDelay = 0.8
+    
+    open var mentions: [String] = []
     /// Set your custom visual theme, or just choose between pre-defined SearchTextFieldTheme.lightTheme() and SearchTextFieldTheme.darkTheme() themes
     open var theme = SearchTextFieldTheme.lightTheme() {
         didSet {
@@ -41,7 +43,7 @@ open class SearchTextField: UITextField {
                 
                 self.placeholderLabel?.textColor = placeholderColor
             }
-           
+            
             if let hightlightedFont = self.highlightAttributes[.font] as? UIFont {
                 self.highlightAttributes[.font] = hightlightedFont.withSize(self.theme.font.pointSize)
             }
@@ -102,20 +104,20 @@ open class SearchTextField: UITextField {
     
     /// When InlineMode is true, the suggestions appear in the same line than the entered string. It's useful for email domains suggestion for example.
     /*open var inlineMode: Bool = false {
-        didSet {
-            if inlineMode == true {
-                autocorrectionType = .no
-                spellCheckingType = .no
-            }
-        }
-    }*/
+     didSet {
+     if inlineMode == true {
+     autocorrectionType = .no
+     spellCheckingType = .no
+     }
+     }
+     }*/
     
     /// Only valid when InlineMode is true. The suggestions appear after typing the provided string (or even better a character like '@')
     open var startFilteringAfter: String?
     
     /// Min number of characters to start filtering
     open var minCharactersNumberToStartFiltering: Int = 0
-
+    
     /// Force no filtering (display the entire filtered data source)
     open var forceNoFiltering: Bool = false
     
@@ -127,7 +129,7 @@ open class SearchTextField: UITextField {
     
     /// Set the results list's header
     open var resultsListHeader: UIView?
-
+    
     // Move the table around to customize for your layout
     open var tableXOffset: CGFloat = 0.0
     open var tableYOffset: CGFloat = 0.0
@@ -403,8 +405,14 @@ open class SearchTextField: UITextField {
                 if let filterAfter = startFilteringAfter {
                     let stringElements = self.filterText.components(separatedBy: filterAfter)
                     self.text = self.text?.replacingOccurrences(of: self.filterText, with: stringElements.first! + filterAfter + firstElement.title)
+                    if !self.mentions.contains(stringElements.first! + filterAfter + firstElement.title) {
+                        self.mentions.append(stringElements.first! + filterAfter + firstElement.title)
+                    }
                 } else {
                     self.text = self.text?.replacingOccurrences(of: self.filterText, with: firstElement.title)
+                    if !self.mentions.contains(firstElement.title) {
+                        self.mentions.append(firstElement.title)
+                    }
                 }
                 
                 self.filterText = ""
@@ -476,6 +484,9 @@ open class SearchTextField: UITextField {
     fileprivate func clearResults() {
         filteredResults.removeAll()
         tableView?.removeFromSuperview()
+        if text!.isEmpty {
+            self.mentions = []
+        }
     }
     
     // Look for Font attribute, and if it exists, adapt to the subtitle font size
@@ -583,6 +594,9 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if itemSelectionHandler == nil {
             self.text = self.text?.replacingOccurrences(of: self.filterText, with: filteredResults[(indexPath as NSIndexPath).row].title)
+            if !self.mentions.contains(filteredResults[(indexPath as NSIndexPath).row].title) {
+                self.mentions.append(filteredResults[(indexPath as NSIndexPath).row].title)
+            }
             self.filterText = ""
         } else {
             let index = indexPath.row
