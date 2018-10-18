@@ -575,10 +575,11 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
         cell!.detailTextLabel?.attributedText = filteredResults[(indexPath as NSIndexPath).row].attributedSubtitle
         
         cell!.imageView?.image = filteredResults[(indexPath as NSIndexPath).row].image
-        cell!.imageView?.sd_setImage(
-            with: URL(string: filteredResults[(indexPath as NSIndexPath).row].imageUrl!),
-            placeholderImage: filteredResults[(indexPath as NSIndexPath).row].image)
-        
+        if let imageUrl = filteredResults[(indexPath as NSIndexPath).row].imageUrl {
+            cell!.imageView?.sd_setImage(
+                with: URL(string: imageUrl),
+                placeholderImage: filteredResults[(indexPath as NSIndexPath).row].image)
+        }
         cell!.selectionStyle = .none
         
         return cell!
