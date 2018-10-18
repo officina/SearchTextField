@@ -592,6 +592,7 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if itemSelectionHandler == nil {
             self.text = self.text?.replacingOccurrences(of: self.filterText, with: filteredResults[(indexPath as NSIndexPath).row].title)
+            self.filterText = ""
         } else {
             let index = indexPath.row
             itemSelectionHandler!(filteredResults, index)
