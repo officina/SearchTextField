@@ -433,19 +433,9 @@ open class SearchTextField: UITextField {
             
             let item = filterDataSource[i]
             
-            if let filterAfter = startFilteringAfter {
-                var textToFilter = self.text!.lowercased()
-                
-                if let suffixToFilter = textToFilter.components(separatedBy: filterAfter).last, (suffixToFilter != "" || startSuggestingInmediately == true), textToFilter != suffixToFilter {
-                    textToFilter = suffixToFilter
-                    self.filterText = textToFilter
-                } else {
-                    placeholderLabel?.text = ""
-                    return
-                }
-                
-                let titleFilterRange = (item.title as NSString).range(of: textToFilter, options: comparisonOptions)
-                let subtitleFilterRange = item.subtitle != nil ? (item.subtitle! as NSString).range(of: textToFilter, options: comparisonOptions) : NSMakeRange(NSNotFound, 0)
+            if startFilteringAfter != nil {
+                let titleFilterRange = (item.title as NSString).range(of: self.filterText, options: comparisonOptions)
+                let subtitleFilterRange = item.subtitle != nil ? (item.subtitle! as NSString).range(of: self.filterText, options: comparisonOptions) : NSMakeRange(NSNotFound, 0)
                 
                 if titleFilterRange.location != NSNotFound || subtitleFilterRange.location != NSNotFound || addAll {
                     item.attributedTitle = NSMutableAttributedString(string: item.title)
