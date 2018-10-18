@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "SearchTextField"
-  s.version          = "1.2.3"
+  s.version          = "1.2.2"
   s.summary          = "SearchTextField extends UITextField allowing you to add the autocomplete feature in a really easy way"
   s.swift_version = "4.2"
 
@@ -44,5 +44,5 @@ SearchTextField supports two different modes: the classic dropdown list (by defa
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'SDWebImage', '~> 4.0'
+  s.dependency 'SDWebImage', '~>3.8'
 end
