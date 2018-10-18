@@ -30,6 +30,7 @@ open class SearchTextField: UITextField {
     /// How long to wait before deciding typing has stopped
     open var typingStoppedDelay = 0.8
     
+    open var mentions: [String] = []
     /// Set your custom visual theme, or just choose between pre-defined SearchTextFieldTheme.lightTheme() and SearchTextFieldTheme.darkTheme() themes
     open var theme = SearchTextFieldTheme.lightTheme() {
         didSet {
@@ -407,6 +408,9 @@ open class SearchTextField: UITextField {
                 } else {
                     self.text = self.text?.replacingOccurrences(of: self.filterText, with: firstElement.title)
                 }
+                if !self.mentions.contains(self.filterText) {
+                    self.mentions.append(self.filterText)
+                }
                 self.filterText = ""
             }
         }
@@ -476,6 +480,9 @@ open class SearchTextField: UITextField {
     fileprivate func clearResults() {
         filteredResults.removeAll()
         tableView?.removeFromSuperview()
+        if text!.isEmpty {
+            self.mentions = []
+        }
     }
     
     // Look for Font attribute, and if it exists, adapt to the subtitle font size
@@ -583,6 +590,9 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if itemSelectionHandler == nil {
             self.text = self.text?.replacingOccurrences(of: self.filterText, with: filteredResults[(indexPath as NSIndexPath).row].title)
+            if !self.mentions.contains(self.filterText) {
+                self.mentions.append(self.filterText)
+            }
             self.filterText = ""
         } else {
             let index = indexPath.row
