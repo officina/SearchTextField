@@ -436,7 +436,9 @@ open class SearchTextField: UITextField {
         if self.text!.count < minCharactersNumberToStartFiltering {
             return
         }
-        
+        if self.text!.last == " " {
+            return
+        }
         for i in 0 ..< filterDataSource.count {
             
             let item = filterDataSource[i]
