@@ -437,7 +437,9 @@ open class SearchTextField: UITextField {
             return
         }
         if self.text!.last == " " {
-            self.tableView?.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: UITableView.ScrollPosition.middle)
+            let index = IndexPath(row: 0, section: 0)
+            self.tableView?.selectRow(at: index, animated: true, scrollPosition: UITableView.ScrollPosition.middle)
+            self.tableView(self.tableView!, didSelectRowAt: index)
             return
         }
         for i in 0 ..< filterDataSource.count {
