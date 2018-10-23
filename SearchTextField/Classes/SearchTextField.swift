@@ -431,14 +431,6 @@ open class SearchTextField: UITextField {
     }
     
     fileprivate func filter(forceShowAll addAll: Bool) {
-        if self.text!.last == " " {
-            if filteredResults.count > 0 && filterText.count > 0 {
-                let index = IndexPath(row: 0, section: 0)
-                self.tableView?.selectRow(at: index, animated: true, scrollPosition: UITableView.ScrollPosition.middle)
-                self.tableView(self.tableView!, didSelectRowAt: index)
-            }
-            return
-        }
         clearResults()
         
         if self.text!.count < minCharactersNumberToStartFiltering {
@@ -463,6 +455,14 @@ open class SearchTextField: UITextField {
                     }
                     
                     filteredResults.append(item)
+                    if self.text!.last == " " {
+                        if filteredResults.count > 0 && filterText.count > 0 {
+                            let index = IndexPath(row: 0, section: 0)
+                            self.tableView?.selectRow(at: index, animated: true, scrollPosition: UITableView.ScrollPosition.middle)
+                            self.tableView(self.tableView!, didSelectRowAt: index)
+                        }
+                        return
+                    }
                 }
             } else {
                 // Find text in title and subtitle
