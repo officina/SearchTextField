@@ -600,7 +600,10 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if itemSelectionHandler == nil {
-            self.text = self.text?.replacingOccurrences(of: self.filterText, with: filteredResults[(indexPath as NSIndexPath).row].title)
+            self.text = self.text?.replacingOccurrences(of: self.filterText,
+                                            with: filteredResults[(indexPath as NSIndexPath).row].title,
+                                            options: [.caseInsensitive],
+                                            range: self.text?.range(of: self.filterText, options: .backwards))
             if !self.mentions.contains(filteredResults[(indexPath as NSIndexPath).row].title) {
                 self.mentions.append(filteredResults[(indexPath as NSIndexPath).row].title)
             }
