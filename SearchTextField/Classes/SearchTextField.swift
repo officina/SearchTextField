@@ -585,8 +585,12 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
         cell!.detailTextLabel?.text = filteredResults[(indexPath as NSIndexPath).row].subtitle
         cell!.textLabel?.attributedText = filteredResults[(indexPath as NSIndexPath).row].attributedTitle
         cell!.detailTextLabel?.attributedText = filteredResults[(indexPath as NSIndexPath).row].attributedSubtitle
+        if let image = cell!.imageView {
+            image.frame = CGRect(x: image.frame.origin.x, y: image.frame.origin.y, width: theme.imageViewDimension, height: theme.imageViewDimension)
+            image.contentMode = .scaleAspectFit
+            image.image = filteredResults[(indexPath as NSIndexPath).row].image
+        }
         
-        cell!.imageView?.image = filteredResults[(indexPath as NSIndexPath).row].image
         if let imageUrl = filteredResults[(indexPath as NSIndexPath).row].imageUrl {
             cell!.imageView?.sd_setImage(
                 with: URL(string: imageUrl),
@@ -627,6 +631,7 @@ extension SearchTextField: UITableViewDelegate, UITableViewDataSource {
 
 public struct SearchTextFieldTheme {
     public var cellHeight: CGFloat
+    public var imageViewDimension:CGFloat = 55
     public var bgColor: UIColor
     public var borderColor: UIColor
     public var borderWidth : CGFloat = 0
@@ -636,7 +641,7 @@ public struct SearchTextFieldTheme {
     public var subtitleFontColor: UIColor
     public var placeholderColor: UIColor?
     
-    init(cellHeight: CGFloat, bgColor:UIColor, borderColor: UIColor, separatorColor: UIColor, font: UIFont, fontColor: UIColor, subtitleFontColor: UIColor? = nil) {
+    init(cellHeight: CGFloat, bgColor:UIColor, borderColor: UIColor, separatorColor: UIColor, font: UIFont, fontColor: UIColor, subtitleFontColor: UIColor? = nil, imageViewDimension: CGFloat = 55) {
         self.cellHeight = cellHeight
         self.borderColor = borderColor
         self.separatorColor = separatorColor
@@ -644,6 +649,7 @@ public struct SearchTextFieldTheme {
         self.font = font
         self.fontColor = fontColor
         self.subtitleFontColor = subtitleFontColor ?? fontColor
+        self.imageViewDimension = imageViewDimension
     }
     
     public static func lightTheme() -> SearchTextFieldTheme {
