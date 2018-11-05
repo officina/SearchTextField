@@ -289,7 +289,7 @@ open class SearchTextField: UITextField {
                     tableHeight -= tableBottomMargin
                 }
                 
-                var tableViewFrame = CGRect(x: 0, y: 0, width: frame.size.width - 4, height: tableHeight)
+                /*var tableViewFrame = CGRect(x: 0, y: 0, width: frame.size.width - 4, height: tableHeight)
                 tableViewFrame.origin = self.convert(tableViewFrame.origin, to: nil)
                 tableViewFrame.origin.x += 2 + tableXOffset
                 tableViewFrame.origin.y += frame.size.height + 2 + tableYOffset
