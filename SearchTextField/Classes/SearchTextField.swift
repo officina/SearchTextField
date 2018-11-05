@@ -215,7 +215,7 @@ open class SearchTextField: UITextField {
                 tableView.semanticContentAttribute = .forceRightToLeft
             }
             
-            shadowView.backgroundColor = UIColor.lightText
+            shadowView.backgroundColor = UIColor.black
             shadowView.layer.shadowColor = UIColor.black.cgColor
             shadowView.layer.shadowOffset = CGSize.zero
             shadowView.layer.shadowOpacity = 1
